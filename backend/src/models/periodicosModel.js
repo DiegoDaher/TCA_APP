@@ -1,5 +1,5 @@
 // src/models/periodicosModel.js
-import { DataTypes } from 'sequelize';
+import { DataTypes, Op } from 'sequelize';
 import sequelize from '../config/db.js';   // <-- tu instancia de Sequelize (MySQL)
 
 const Periodico = sequelize.define(
@@ -43,6 +43,10 @@ const Periodico = sequelize.define(
   }
 );
 
+// Función para obtener nombres de columnas disponibles
+const getColumns = () => {
+  return Object.keys(Periodico.rawAttributes); // Devuelve ["Id", "Año", "Tomo", "Periodo", "Fecha_de_creacion", "Status"]
+};
 
 const create = async (data) => {
   return await Periodico.create(data);
@@ -54,17 +58,17 @@ const findAll = async ({ page = 1, limit = 10, column = null, value = null, filt
   const where = {};
 
   // Filtros por columna (opcional)
-  if (filters.titulo) where.Titulo = { [DataTypes.Op.like]: `%${filters.titulo}%` };
-  if (filters.año)    where.Año    = { [DataTypes.Op.like]: `%${filters.año}%` };
+  if (filters.titulo) where.Titulo = { [Op.like]: `%${filters.titulo}%` };
+  if (filters.año)    where.Año    = { [Op.like]: `%${filters.año}%` };
   if (filters.tomo)   where.Tomo   = parseInt(filters.tomo);
   if (filters.status !== undefined) where.Status = filters.status;
 
   // Búsqueda general (q) sobre campos de texto
   if (q && !column) {
-    where[DataTypes.Op.or] = [
-      { Titulo: { [DataTypes.Op.like]: `%${q}%` } },
-      { Año:    { [DataTypes.Op.like]: `%${q}%` } },
-      { Observaciones: { [DataTypes.Op.like]: `%${q}%` } },
+    where[Op.or] = [
+      { Titulo: { [Op.like]: `%${q}%` } },
+      { Año:    { [Op.like]: `%${q}%` } },
+      { Observaciones: { [Op.like]: `%${q}%` } },
     ];
   }
 
@@ -92,18 +96,27 @@ const findById = async (id) => {
 
 const update = async (id, data) => {
   try {
-    const [updated] = await Periodico.update(data, { where: { Id: id } });
-    if (updated === 0) throw new Error('Registro no encontrado o sin cambios');
-    return await Periodico.findByPk(id);
+    if (Object.keys(data).length === 0) {
+      throw new Error('No se proporcionaron campos válidos para actualizar');
+    }
+
+    const [updated] = await Periodico.update(data, {
+      where: { Id: id },
+      fields: Object.keys(data),  // Asegura que solo se actualicen los campos proporcionados
+    });
+    if (updated === 0) {
+      throw new Error('Registro no encontrado o sin cambios');
+    }
+    const updatedEntry = await Periodico.findByPk(id);
+    return updatedEntry;
   } catch (error) {
     throw new Error(`Error al actualizar el registro: ${error.message}`);
   }
 };
-
 sequelize
-  .sync({ alter: true })
+  .sync({ alter: false })
   .then(() => console.log("Tabla 'periodicos' sincronizada"))
   .catch((err) => console.error('Error sincronizando periodicos:', err));
 
 export default Periodico;
-export { create, findAll, findById, update };
+export { create, findAll, findById, update, getColumns };

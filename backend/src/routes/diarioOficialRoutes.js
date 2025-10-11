@@ -11,7 +11,7 @@ router.get('/columns', diarioOficialController.getAvailableColumns);
 
 router.put('/:id', diarioOficialController.update);
 
-router.put('/:id/deactivate', diarioOficialController.deactivate);
-router.put('/:id/restore', diarioOficialController.restore);
+router.put('/deactivate/:id', diarioOficialController.deactivate);
+router.put('/restore/:id', diarioOficialController.restore);
 
 export default router;

@@ -1,21 +1,36 @@
-import DiarioOficial, { findAll,findById,  update , getColumns} from '../models/diarioOficialModel.js';
+import ColeccionDurango, { create, findAll, findById, update, getColumns } from '../models/coleccionDurangoModel.js';
 
 // Método para crear un nuevo registro
-const createDiarioOficial = async (req, res) => {
-  const { Año, Tomo, Periodo, Fecha_de_creacion, Status } = req.body;
+const createColeccionDurango = async (req, res) => {
+  const { Letra,Titulo, Autor, Año, Editorial, Edición, ISBN, Ejemplares, Fecha_de_creacion, Status } = req.body;
 
   // Validaciones requeridas
+  if(!Letra || typeof Letra !== 'string' || Letra.length !== 1){
+    return res.status(400).json({ error: 'El campo "Letra" es requerido y debe ser una cadena de texto de un solo carácter.' });
+  }
+  if (!Titulo || typeof Titulo !== 'string') {
+    return res.status(400).json({ error: 'El campo "Titulo" es requerido y debe ser una cadena de texto.' });
+  }
+  if (Autor && (typeof Autor !== 'string' || Autor.length > 100)) {
+    return res.status(400).json({ error: 'El campo "Autor" debe ser una cadena de texto de máximo 100 caracteres.' });
+  }
   if (!Año || typeof Año !== 'string') {
     return res.status(400).json({ error: 'El campo "Año" es requerido y debe ser una cadena de texto.' });
   }
-  if (Año.lengath > 16) {
+  if (Año.length > 16) {
     return res.status(400).json({ error: 'El campo "Año" no puede exceder los 16 caracteres.' });
   }
-  if (!Tomo || typeof Tomo !== 'number' || !Number.isInteger(Tomo)) {
-    return res.status(400).json({ error: 'El campo "Tomo" es requerido y debe ser un número entero.' });
+  if (Editorial && (typeof Editorial !== 'string' || Editorial.length > 100)) {
+    return res.status(400).json({ error: 'El campo "Editorial" debe ser una cadena de texto de máximo 100 caracteres.' });
   }
-  if (Periodo && (typeof Periodo !== 'string' || Periodo.length > 150)) {
-    return res.status(400).json({ error: 'El campo "Periodo" debe ser una cadena de texto de máximo 150 caracteres.' });
+  if (typeof Edición !== 'string' || Edición.length > 100) {
+    return res.status(400).json({ error: 'El campo "Edición" debe ser una cadena de texto de máximo 100 caracteres.' });
+  }
+  if (ISBN && (typeof ISBN !== 'string' || ISBN.length > 100)) {
+    return res.status(400).json({ error: 'El campo "ISBN" debe ser una cadena de texto de máximo 100 caracteres.' });
+  }
+  if (Ejemplares && (typeof Ejemplares !== 'number' || !Number.isInteger(Ejemplares))) {
+    return res.status(400).json({ error: 'El campo "Ejemplares" debe ser un número entero.' });
   }
   if (Fecha_de_creacion && isNaN(Date.parse(Fecha_de_creacion))) {
     return res.status(400).json({ error: 'El campo "Fecha_de_creacion" debe ser una fecha válida (formato YYYY-MM-DD).' });
@@ -25,12 +40,17 @@ const createDiarioOficial = async (req, res) => {
   }
 
   try {
-    const newEntry = await DiarioOficial.create({
-      Año,
-      Tomo,
-      Periodo: Periodo || null, // Sequelize maneja null si no se envía
-      Fecha_de_creacion: Fecha_de_creacion, // Usa default en DB si no se envía
-      Status: Status !== undefined ? Status : undefined, // Usa default en DB si no se envía
+    const newEntry = await ColeccionDurango.create({
+      Letra,
+      Titulo,
+      Autor,
+      Año: Año || null, // Sequelize maneja null si no se envía
+      Editorial: Editorial || null,
+      Edición: Edición || null,
+      ISBN: ISBN || null,
+      Ejemplares,
+      Fecha_de_creacion, // Usa default en DB si no se envía
+      Status, // Usa default en DB si no se envía
     });
     res.status(201).json({ message: 'Registro agregado exitosamente', data: newEntry });
   } catch (error) {
@@ -56,21 +76,36 @@ const getById = async (req, res) => {
 };
 
 // Método para actualizar un registro por ID
-const updateDiarioOficial = async (req, res) => {
+const updateColeccionDurango = async (req, res) => {
   const { id } = req.params;
-  const { Año, Tomo, Periodo, Fecha_de_creacion, Status } = req.body;
+  const { Letra, Titulo, Autor, Año, Editorial, Edición, ISBN, Ejemplares, Fecha_de_creacion, Status } = req.body;
 
-  // Validaciones
-  if (Año && (typeof Año !== 'string' || Año.length > 16)) {
-    return res.status(400).json({ error: 'El campo "Año" debe ser una cadena de texto de máximo 16 caracteres.' });
+  // Validaciones solo si los campos están presentes en el body
+  if (Letra !== undefined && (typeof Letra !== 'string' || Letra.length !== 1)) {
+    return res.status(400).json({ error: 'El campo "Letra" debe ser una cadena de texto de un solo carácter.' });
   }
-  if (Tomo && (typeof Tomo !== 'number' || !Number.isInteger(Tomo))) {
-    return res.status(400).json({ error: 'El campo "Tomo" debe ser un número entero.' });
+  if (Titulo !== undefined && typeof Titulo !== 'string') {
+    return res.status(400).json({ error: 'El campo "Titulo" debe ser una cadena de texto.' });
   }
-  if (Periodo && (typeof Periodo !== 'string' || Periodo.length > 150)) {
-    return res.status(400).json({ error: 'El campo "Periodo" debe ser una cadena de texto de máximo 150 caracteres.' });
+  if (Autor !== undefined && (typeof Autor !== 'string' || Autor.length > 100)) {
+    return res.status(400).json({ error: 'El campo "Autor" debe ser una cadena de texto de máximo 100 caracteres.' });
   }
-  if (Fecha_de_creacion && isNaN(Date.parse(Fecha_de_creacion))) {
+  if (Año !== undefined && (typeof Año !== 'string' || Año.length > 16)) {
+    return res.status(400).json({ error: 'El campo "Año" debe ser una cadena de texto y no puede exceder los 16 caracteres.' });
+  }
+  if (Editorial !== undefined && (typeof Editorial !== 'string' || Editorial.length > 100)) {
+    return res.status(400).json({ error: 'El campo "Editorial" debe ser una cadena de texto de máximo 100 caracteres.' });
+  }
+  if (typeof Edición !== 'string' || Edición.length > 100) {
+    return res.status(400).json({ error: 'El campo "Edición" debe ser una cadena de texto de máximo 100 caracteres.' });
+  }
+  if (ISBN !== undefined && (typeof ISBN !== 'string' || ISBN.length > 100)) {
+    return res.status(400).json({ error: 'El campo "ISBN" debe ser una cadena de texto de máximo 100 caracteres.' });
+  }
+  if (Ejemplares !== undefined && (typeof Ejemplares !== 'number' || !Number.isInteger(Ejemplares))) {
+    return res.status(400).json({ error: 'El campo "Ejemplares" debe ser un número entero.' });
+  }
+  if (Fecha_de_creacion !== undefined && isNaN(Date.parse(Fecha_de_creacion))) {
     return res.status(400).json({ error: 'El campo "Fecha_de_creacion" debe ser una fecha válida (formato YYYY-MM-DD).' });
   }
   if (Status !== undefined && typeof Status !== 'boolean') {
@@ -79,9 +114,14 @@ const updateDiarioOficial = async (req, res) => {
 
   // Solo incluimos los campos enviados en el body
   const updateData = {};
-  if (Año) updateData.Año = Año;
-  if (Tomo) updateData.Tomo = Tomo;
-  if (Periodo !== undefined) updateData.Periodo = Periodo;
+  if (Letra !== undefined) updateData.Letra = Letra;
+  if (Titulo !== undefined) updateData.Titulo = Titulo;
+  if (Autor !== undefined) updateData.Autor = Autor;
+  if (Año !== undefined) updateData.Año = Año;
+  if (Editorial !== undefined) updateData.Editorial = Editorial;
+  if (Edición !== undefined) updateData.Edición = Edición;
+  if (ISBN !== undefined) updateData.ISBN = ISBN;
+  if (Ejemplares !== undefined) updateData.Ejemplares = Ejemplares;
   if (Fecha_de_creacion !== undefined) updateData.Fecha_de_creacion = Fecha_de_creacion;
   if (Status !== undefined) updateData.Status = Status;
 
@@ -93,7 +133,7 @@ const updateDiarioOficial = async (req, res) => {
   }
 };
 
-const getDiarioOficial = async (req, res) => {
+const getColeccionDurango = async (req, res) => {
   const { page = 1, limit = 10, column, value, q } = req.query;
 
   const parsedPage = parseInt(page);
@@ -167,4 +207,4 @@ const restore = async (req, res) => {
   }
 };
 
-export default { createDiarioOficial, getDiarioOficial, getById, update: updateDiarioOficial,getAvailableColumns, deactivate, restore };
+export default { createColeccionDurango, getColeccionDurango, getById, update: updateColeccionDurango, getAvailableColumns, deactivate, restore };

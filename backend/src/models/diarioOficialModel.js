@@ -37,40 +37,8 @@ const DiarioOficial = sequelize.define(
   }
 );
 
-const create = async (req, res) => {
-  const { Año, Tomo, Periodo, Fecha_de_creacion, Status } = req.body;
-
-  if (!Año || typeof Año !== 'string') {
-    return res.status(400).json({ error: 'El campo "Año" es requerido y debe ser una cadena de texto.' });
-  }
-  if (Año.length > 16) {
-    return res.status(400).json({ error: 'El campo "Año" no puede exceder los 16 caracteres.' });
-  }
-  if (!Tomo || typeof Tomo !== 'number' || !Number.isInteger(Tomo)) {
-    return res.status(400).json({ error: 'El campo "Tomo" es requerido y debe ser un número entero.' });
-  }
-  if (Periodo && (typeof Periodo !== 'string' || Periodo.length > 150)) {
-    return res.status(400).json({ error: 'El campo "Periodo" debe ser una cadena de texto de máximo 150 caracteres.' });
-  }
-  if (Fecha_de_creacion && isNaN(Date.parse(Fecha_de_creacion))) {
-    return res.status(400).json({ error: 'El campo "Fecha_de_creacion" debe ser una fecha válida (formato YYYY-MM-DD).' });
-  }
-  if (Status !== undefined && typeof Status !== 'boolean') {
-    return res.status(400).json({ error: 'El campo "Status" debe ser un booleano (true/false).' });
-  }
-
-  try {
-    const newEntry = await DiarioOficial.create({
-      Año,
-      Tomo,
-      Periodo: Periodo || null,
-      Fecha_de_creacion: Fecha_de_creacion || null,
-      Status: Status !== undefined ? Status : undefined,
-    });
-    res.status(201).json({ message: 'Registro agregado exitosamente', data: newEntry });
-  } catch (error) {
-    res.status(500).json({ error: `Error al crear el registro: ${error.message}` });
-  }
+const create = async (data) => {
+  return await DiarioOficial.create(data);
 };
 
 // Función para obtener nombres de columnas disponibles

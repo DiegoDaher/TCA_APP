@@ -1,21 +1,24 @@
-import DiarioOficial, { findAll,findById,  update , getColumns} from '../models/diarioOficialModel.js';
+import Periodicos, { findAll,findById,  update , getColumns} from '../models/periodicosModel.js';
 
 // Método para crear un nuevo registro
-const createDiarioOficial = async (req, res) => {
-  const { Año, Tomo, Periodo, Fecha_de_creacion, Status } = req.body;
+const createPeriodicos = async (req, res) => {
+  const { Titulo, Año, Tomo, Observaciones, Fecha_de_creacion, Status } = req.body;
 
   // Validaciones requeridas
+  if (!Titulo || typeof Titulo !== 'string') {
+    return res.status(400).json({ error: 'El campo "Titulo" es requerido y debe ser una cadena de texto.' });
+  }
   if (!Año || typeof Año !== 'string') {
     return res.status(400).json({ error: 'El campo "Año" es requerido y debe ser una cadena de texto.' });
   }
-  if (Año.lengath > 16) {
+  if (Año.length > 16) {
     return res.status(400).json({ error: 'El campo "Año" no puede exceder los 16 caracteres.' });
   }
   if (!Tomo || typeof Tomo !== 'number' || !Number.isInteger(Tomo)) {
     return res.status(400).json({ error: 'El campo "Tomo" es requerido y debe ser un número entero.' });
   }
-  if (Periodo && (typeof Periodo !== 'string' || Periodo.length > 150)) {
-    return res.status(400).json({ error: 'El campo "Periodo" debe ser una cadena de texto de máximo 150 caracteres.' });
+  if (Observaciones && (typeof Observaciones !== 'string' || Observaciones.length > 150)) {
+    return res.status(400).json({ error: 'El campo "Observaciones" debe ser una cadena de texto de máximo 150 caracteres.' });
   }
   if (Fecha_de_creacion && isNaN(Date.parse(Fecha_de_creacion))) {
     return res.status(400).json({ error: 'El campo "Fecha_de_creacion" debe ser una fecha válida (formato YYYY-MM-DD).' });
@@ -25,10 +28,11 @@ const createDiarioOficial = async (req, res) => {
   }
 
   try {
-    const newEntry = await DiarioOficial.create({
+    const newEntry = await Periodicos.create({
+      Titulo,
       Año,
       Tomo,
-      Periodo: Periodo || null, // Sequelize maneja null si no se envía
+      Observaciones: Observaciones || null,
       Fecha_de_creacion: Fecha_de_creacion, // Usa default en DB si no se envía
       Status: Status !== undefined ? Status : undefined, // Usa default en DB si no se envía
     });
@@ -56,9 +60,9 @@ const getById = async (req, res) => {
 };
 
 // Método para actualizar un registro por ID
-const updateDiarioOficial = async (req, res) => {
+const updatePeriodicos = async (req, res) => {
   const { id } = req.params;
-  const { Año, Tomo, Periodo, Fecha_de_creacion, Status } = req.body;
+  const { Titulo, Año, Tomo, Observaciones, Fecha_de_creacion, Status } = req.body;
 
   // Validaciones
   if (Año && (typeof Año !== 'string' || Año.length > 16)) {
@@ -67,8 +71,8 @@ const updateDiarioOficial = async (req, res) => {
   if (Tomo && (typeof Tomo !== 'number' || !Number.isInteger(Tomo))) {
     return res.status(400).json({ error: 'El campo "Tomo" debe ser un número entero.' });
   }
-  if (Periodo && (typeof Periodo !== 'string' || Periodo.length > 150)) {
-    return res.status(400).json({ error: 'El campo "Periodo" debe ser una cadena de texto de máximo 150 caracteres.' });
+  if (Observaciones && (typeof Observaciones !== 'string' || Observaciones.length > 150)) {
+    return res.status(400).json({ error: 'El campo "Observaciones" debe ser una cadena de texto de máximo 150 caracteres.' });
   }
   if (Fecha_de_creacion && isNaN(Date.parse(Fecha_de_creacion))) {
     return res.status(400).json({ error: 'El campo "Fecha_de_creacion" debe ser una fecha válida (formato YYYY-MM-DD).' });
@@ -79,9 +83,10 @@ const updateDiarioOficial = async (req, res) => {
 
   // Solo incluimos los campos enviados en el body
   const updateData = {};
+  if (Titulo) updateData.Titulo = Titulo;
   if (Año) updateData.Año = Año;
   if (Tomo) updateData.Tomo = Tomo;
-  if (Periodo !== undefined) updateData.Periodo = Periodo;
+  if (Observaciones !== undefined) updateData.Observaciones = Observaciones;
   if (Fecha_de_creacion !== undefined) updateData.Fecha_de_creacion = Fecha_de_creacion;
   if (Status !== undefined) updateData.Status = Status;
 
@@ -93,7 +98,7 @@ const updateDiarioOficial = async (req, res) => {
   }
 };
 
-const getDiarioOficial = async (req, res) => {
+const getPeriodicos = async (req, res) => {
   const { page = 1, limit = 10, column, value, q } = req.query;
 
   const parsedPage = parseInt(page);
@@ -167,4 +172,4 @@ const restore = async (req, res) => {
   }
 };
 
-export default { createDiarioOficial, getDiarioOficial, getById, update: updateDiarioOficial,getAvailableColumns, deactivate, restore };
+export default { createPeriodicos, getPeriodicos, getById, update: updatePeriodicos, getAvailableColumns, deactivate, restore };

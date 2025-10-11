@@ -1,5 +1,8 @@
 import express from 'express';
 import diarioOficialRoutes from './src/routes/diarioOficialRoutes.js';
+import periodicosRoutes from './src/routes/periodicosRoutes.js';
+import coleccionDurangoRoutes from './src/routes/coleccionDurangoRoutes.js';
+import librosRoutes from './src/routes/librosRoutes.js';
 import dotenv from 'dotenv';
 import sequelize from './src/config/db.js'; // Importamos Sequelize desde config
 
@@ -15,6 +18,10 @@ app.get('/api', (req, res) => {
 
 // Montar rutas
 app.use('/api/diario-oficial', diarioOficialRoutes);
+app.use('/api/periodicos', periodicosRoutes);
+app.use('/api/colecciondurango', coleccionDurangoRoutes);
+app.use('/api/libros', librosRoutes);
+
 
 // Verificar conexión de Sequelize (opcional, ya que los modelos lo hacen)
 sequelize
