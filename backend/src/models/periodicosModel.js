@@ -52,33 +52,60 @@ const create = async (data) => {
   return await Periodico.create(data);
 };
 
-const findAll = async ({ page = 1, limit = 10, column = null, value = null, filters = {}, q = null }) => {
+const findAll = async ({ page = 1, limit = 10, column = null, value = null, filters = {}, q = null}) => {
   try {
-  const offset = (page - 1) * limit;
-  const where = {};
+    const offset = (page - 1) * limit;
+    let where = {...filters};
 
-  // Filtros por columna (opcional)
-  if (filters.titulo) where.Titulo = { [Op.like]: `%${filters.titulo}%` };
-  if (filters.año)    where.Año    = { [Op.like]: `%${filters.año}%` };
-  if (filters.tomo)   where.Tomo   = parseInt(filters.tomo);
-  if (filters.status !== undefined) where.Status = filters.status;
+    // Búsqueda por columna específica
+    if (column && value) {
+      const normalizedColumn = column.trim();
+      switch (normalizedColumn) {
+        case 'Titulo':
+          where.Titulo = { [Op.like]: `${value}%` };
+          break;
+        case 'Año':
+          where.Año = { [Op.like]: `%${value}%` };
+          break;
+        case 'Tomo':
+          const tomoNum = parseInt(value);
+          if (!isNaN(tomoNum)) where.Tomo = tomoNum;
+          break;
+        case 'Observaciones':
+          where.Observaciones = { [Op.like]: `%${value}%` };
+          break;
+        case 'Fecha_de_creacion':
+          if (!isNaN(Date.parse(value))) where.Fecha_de_creacion = value;
+          break;
+        case 'Status':
+          const statusBool = value === 'true' || value === '1';
+          where.Status = statusBool;
+          break;
+        case 'Id':
+          const idNum = parseInt(value);
+          if (!isNaN(idNum)) where.Id = idNum;
+          break;
+        default:
+          break;
+      }
+    }
 
-  // Búsqueda general (q) sobre campos de texto
-  if (q && !column) {
-    where[Op.or] = [
-      { Titulo: { [Op.like]: `%${q}%` } },
-      { Año:    { [Op.like]: `%${q}%` } },
-      { Observaciones: { [Op.like]: `%${q}%` } },
-    ];
-  }
+    // Búsqueda general (q) sobre campos de texto
+    if (q && !column) {
+      where[Op.or] = [
+        { Titulo: { [Op.like]: `${q}%` } },
+        { Año:    { [Op.like]: `%${q}%` } },
+        { Observaciones: { [Op.like]: `%${q}%` } },
+      ];
+    }
 
-  const { count, rows } = await Periodico.findAndCountAll({
-    where,
-    offset,
-    limit,
-    order: [['Id', 'DESC']],
-  });
-  return { total: count, data: rows };
+    const { count, rows } = await Periodico.findAndCountAll({
+      where,
+      offset,
+      limit,
+      order: [['Id', 'DESC']],
+    });
+    return { total: count, data: rows };
   } catch (error) {
     throw new Error(`Error al listar registros: ${error.message}`);
   }

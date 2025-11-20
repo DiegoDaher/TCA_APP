@@ -106,7 +106,7 @@ const getDiarioOficial = async (req, res) => {
   }
 
   try {
-    const { total, data } = await findAll({ page: parsedPage, limit: parsedLimit, column, value, q });
+    const { total, data } = await findAll({ page: parsedPage, limit: parsedLimit, column, value, q, filters:{ Status: true } });
     const totalPages = Math.ceil(total / parsedLimit);
     res.status(200).json({
       message: 'Registros obtenidos exitosamente',

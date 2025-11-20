@@ -1,12 +1,12 @@
 import { DataTypes, Op } from 'sequelize';
 import sequelize from '../config/db.js';
 
-const Coleccion = sequelize.define(
-  'Coleccion',
+const Libros = sequelize.define(
+  'Libros',
   {
     MFN: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true, // Permitir nulo al crear
     },
     Id: {
       type: DataTypes.INTEGER,
@@ -98,22 +98,22 @@ const Coleccion = sequelize.define(
   },
   {
     timestamps: false,
-    tableName: 'coleccion',
+    tableName: 'libros',
   }
 );
 
 const create = async (data) => {
-  return await Coleccion.create(data);
+  return await Libros.create(data);
 };
 
 const getColumns = () => {
-  return Object.keys(Coleccion.rawAttributes);
+  return Object.keys(Libros.rawAttributes);
 };
 
-const findAll = async ({ page = 1, limit = 10, column = null, value = null, q = null }) => {
+const findAll = async ({ page = 1, limit = 10, column = null, value = null, q = null, filters = {}  }) => {
   try {
     const offset = (page - 1) * limit;
-    let where = {};
+    let where = {...filters};
 
     if (column && value) {
       const normalizedColumn = column.trim();
@@ -139,7 +139,7 @@ const findAll = async ({ page = 1, limit = 10, column = null, value = null, q = 
           where.Autor_Uniforme = { [Op.like]: `%${value}%` };
           break;
         case 'Titulo':
-          where.Titulo = { [Op.like]: `%${value}%` };
+          where.Titulo = { [Op.like]: `${value}%` };
           break;
         case 'Edicion':
           where.Edicion = { [Op.like]: `%${value}%` };
@@ -217,7 +217,7 @@ const findAll = async ({ page = 1, limit = 10, column = null, value = null, q = 
       };
     }
 
-    const { count, rows } = await Coleccion.findAndCountAll({
+    const { count, rows } = await Libros.findAndCountAll({
       where,
       offset,
       limit,
@@ -232,7 +232,7 @@ const findAll = async ({ page = 1, limit = 10, column = null, value = null, q = 
 
 const findById = async (id) => {
   try {
-    const entry = await Coleccion.findByPk(id);
+    const entry = await Libros.findByPk(id);
     if (!entry) {
       throw new Error('Registro no encontrado');
     }
@@ -244,13 +244,13 @@ const findById = async (id) => {
 
 const update = async (id, data) => {
   try {
-    const [updated] = await Coleccion.update(data, {
+    const [updated] = await Libros.update(data, {
       where: { Id: id },
     });
     if (updated === 0) {
       throw new Error('Registro no encontrado o sin cambios');
     }
-    const updatedEntry = await Coleccion.findByPk(id);
+    const updatedEntry = await Libros.findByPk(id);
     return updatedEntry;
   } catch (error) {
     throw new Error(`Error al actualizar el registro: ${error.message}`);
@@ -262,5 +262,5 @@ sequelize
   .then(() => console.log("Tabla 'libros' sincronizada correctamente"))
   .catch((err) => console.error("Error al sincronizar la tabla 'libros':", err));
 
-export default Coleccion;
+export default Libros;
 export { create, findAll, update, findById, getColumns };

@@ -13,6 +13,8 @@ const sequelize = new Sequelize(
     port: process.env.DB_PORT || 3306,
     dialect: 'mysql',
     logging: true, // Desactiva logs SQL (opcional, cámbialo a true para depurar)
+    quoteIdentifiers: false, // Deshabilitar comillas en identificadores para soportar columnas con paréntesis
+    attributeBehavior: 'escape', // Permite usar atributos con paréntesis de forma segura (CVE-2023-22578)
   }
 );
 

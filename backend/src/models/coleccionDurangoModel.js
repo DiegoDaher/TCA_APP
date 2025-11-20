@@ -66,19 +66,22 @@ const getColumns = () => {
   return Object.keys(ColeccionDurango.rawAttributes);
 };
 
-const findAll = async ({ page = 1, limit = 10, column = null, value = null, q = null }) => {
+const findAll = async ({ page = 1, limit = 10, column = null, value = null, q = null, filters = {} }) => {
   try {
     const offset = (page - 1) * limit;
-    let where = {};
+    let where = {...filters};
 
     if (column && value) {
       const normalizedColumn = column.trim();
       switch (normalizedColumn) {
+        case '':
+          where[column] = { [Op.like]: `${value}%` }; // Busca valores que comiencen con "value"
+         break;
         case 'Letra':
           where.Letra = { [Op.like]: `%${value}%` };
           break;
         case 'Titulo':
-          where.Titulo = { [Op.like]: `%${value}%` };
+          where.Titulo = { [Op.like]: `${value}%` };
           break;
         case 'Autor':
           where.Autor = { [Op.like]: `%${value}%` };

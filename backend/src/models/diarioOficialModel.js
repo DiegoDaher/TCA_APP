@@ -1,4 +1,4 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, Op } from 'sequelize';
 import sequelize from '../config/db.js';
 
 const DiarioOficial = sequelize.define(
@@ -47,10 +47,10 @@ const getColumns = () => {
 };
 
 // Función para listar registros con paginación y filtrado dinámico
-const findAll = async ({ page = 1, limit = 10, column = null, value = null, q = null }) => {
+const findAll = async ({ page = 1, limit = 10, column = null, value = null, q = null, filters = {} }) => {
   try {
     const offset = (page - 1) * limit;
-    let where = {};
+    let where = {...filters};
 
     // Filtrado dinámico por columna específica (opcional)
     if (column && value) {
@@ -64,7 +64,7 @@ const findAll = async ({ page = 1, limit = 10, column = null, value = null, q = 
           if (!isNaN(tomoNum)) where.Tomo = tomoNum;
           break;
         case 'Periodo':
-          where.Periodo = { [Op.like]: `%${value}%` };
+          where.Periodo = { [Op.like]: `${value}%` };
           break;
         case 'Fecha_de_creacion':
           if (!isNaN(Date.parse(value))) where.Fecha_de_creacion = value;
@@ -87,8 +87,8 @@ const findAll = async ({ page = 1, limit = 10, column = null, value = null, q = 
     if (q && !column) {
       where = {
         [Op.or]: [
-          { Año: { [Op.like]: `%${q}%` } },
-          { Periodo: { [Op.like]: `%${q}%` } },
+          { Año: { [Op.like]: `${q}%` } },
+          { Periodo: { [Op.like]: `${q}%` } },
         ],
       };
     }

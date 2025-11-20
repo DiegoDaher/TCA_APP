@@ -1,9 +1,8 @@
-import Coleccion, { create, findAll, findById, update, getColumns } from '../models/librosModel.js';
+import Libros, { create, findAll, findById, update, getColumns } from '../models/librosModel.js';
 
 // Método para crear un nuevo registro
 const createLibro = async (req, res) => {
   const { 
-    MFN, 
     Idioma, 
     Autor, 
     Autor_Corporativo, 
@@ -26,10 +25,6 @@ const createLibro = async (req, res) => {
     Status 
   } = req.body;
 
-  // Validaciones requeridas
-  if (!MFN || typeof MFN !== 'number' || !Number.isInteger(MFN)) {
-    return res.status(400).json({ error: 'El campo "MFN" es requerido y debe ser un número entero.' });
-  }
   
   // Validaciones opcionales
   if (Idioma !== undefined && (typeof Idioma !== 'string' || Idioma.length > 20)) {
@@ -47,9 +42,7 @@ const createLibro = async (req, res) => {
   if (Titulo !== undefined && typeof Titulo !== 'string') {
     return res.status(400).json({ error: 'El campo "Titulo" debe ser una cadena de texto.' });
   }
-  if (Edicion !== undefined && typeof Edicion !== 'string') {
-    return res.status(400).json({ error: 'El campo "Edicion" debe ser una cadena de texto.' });
-  }
+  // MFN ya no es requerido en el body, se asignará igual a Id después de crear el registro
   if (Lugar_Publicacion !== undefined && typeof Lugar_Publicacion !== 'string') {
     return res.status(400).json({ error: 'El campo "Lugar_Publicacion" debe ser una cadena de texto.' });
   }
@@ -94,8 +87,8 @@ const createLibro = async (req, res) => {
   }
 
   try {
-    const newEntry = await Coleccion.create({
-      MFN,
+    // Crear el libro sin MFN (para que Id se genere)
+    const newEntry = await Libros.create({
       Idioma: Idioma || null,
       Autor: Autor || null,
       Autor_Corporativo: Autor_Corporativo || null,
@@ -117,7 +110,11 @@ const createLibro = async (req, res) => {
       Fecha_de_creacion,
       Status,
     });
-    res.status(201).json({ message: 'Registro agregado exitosamente', data: newEntry });
+    // Actualizar MFN con el valor de Id
+    await newEntry.update({ MFN: newEntry.Id });
+    // Obtener el registro actualizado
+    const updatedEntry = await Libros.findByPk(newEntry.Id);
+    res.status(201).json({ message: 'Registro agregado exitosamente', data: updatedEntry });
   } catch (error) {
     res.status(500).json({ error: `Error al crear el registro: ${error.message}` });
   }
@@ -278,7 +275,14 @@ const getLibros = async (req, res) => {
   }
 
   try {
-    const { total, data } = await findAll({ page: parsedPage, limit: parsedLimit, column, value, q });
+    // Agregar filtro para Status: true
+    const { total, data } = await findAll({ 
+      page: parsedPage, 
+      limit: parsedLimit, 
+      column, 
+      value, 
+      q, filters: { Status: true } // Filtro adicional
+    });
     const totalPages = Math.ceil(total / parsedLimit);
     res.status(200).json({
       message: 'Registros obtenidos exitosamente',

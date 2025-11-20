@@ -134,7 +134,7 @@ const updateColeccionDurango = async (req, res) => {
 };
 
 const getColeccionDurango = async (req, res) => {
-  const { page = 1, limit = 10, column, value, q } = req.query;
+  const { page = 1, limit = 10, column, value, q,  } = req.query;
 
   const parsedPage = parseInt(page);
   const parsedLimit = parseInt(limit);
@@ -146,7 +146,7 @@ const getColeccionDurango = async (req, res) => {
   }
 
   try {
-    const { total, data } = await findAll({ page: parsedPage, limit: parsedLimit, column, value, q });
+    const { total, data } = await findAll({ page: parsedPage, limit: parsedLimit, column, value, q, filters: { Status: true } });
     const totalPages = Math.ceil(total / parsedLimit);
     res.status(200).json({
       message: 'Registros obtenidos exitosamente',
