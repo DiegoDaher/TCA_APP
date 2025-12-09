@@ -315,7 +315,7 @@ export default function EliminadosScreen() {
               <>
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow className="bg-[var(--tableRow)]">
                       <TableHead>Tipo</TableHead>
                       <TableHead>Número</TableHead>
                       <TableHead>Título / Periodo</TableHead>
@@ -386,7 +386,7 @@ export default function EliminadosScreen() {
                     variant="outline"
                     onClick={goToPreviousPage}
                     disabled={currentPage === 1}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 bg-[var(--selected)] text-white hover:bg-[var(--hoverselect)]"
                   >
                     <ChevronLeft className="h-4 w-4" />
                     Anterior
@@ -400,7 +400,7 @@ export default function EliminadosScreen() {
                     variant="outline"
                     onClick={goToNextPage}
                     disabled={currentPage === totalPages}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 bg-[var(--selected)] text-white hover:bg-[var(--hoverselect)]"
                   >
                     Siguiente
                     <ChevronRight className="h-4 w-4" />

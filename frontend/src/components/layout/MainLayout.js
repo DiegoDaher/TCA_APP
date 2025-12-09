@@ -25,14 +25,14 @@ export default function MainLayout({ children }) {
           <Header onMenuClick={() => setMobileMenuOpen(true)} />
 
           {/* Body (rojo) - Aquí se renderizarán tus páginas */}
-          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-1">
             {children}
           </main>
         </div>
 
         {/* Sidebar para Móvil (usando Sheet de shadcn/ui) */}
         <Sheet open={isMobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetContent side="left" className="p-0 text-white border-none w-64">
+            <SheetContent side="left" className="p-0 text-white border-none w-64 h-full bg-[var(--whitealt)]">
                 {/* Reutilizamos el componente Sidebar dentro del Sheet móvil */}
                 <div className="flex flex-col h-full">
                   <Sidebar mobile={true} />

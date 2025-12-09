@@ -35,8 +35,10 @@ export default function Sidebar({ mobile = false }) {
   });
 
   return (
-    <aside className={`w-64 flex flex-col bg-[var(--whitealt)] text-black p-4 ${mobile ? '' : 'hidden md:flex'}`}>
-      <div className="mb-8 text-center">
+    <aside
+      className={`w-64 flex flex-col border-2 border-gray-200 bg-[var(--whitealt)] text-black  p-4 ${mobile ? '' : 'hidden md:flex'}`}>
+      <div className={"mb-8 text-center"}
+      >
         <Image src="/ICEDbn.png" alt="Logo" width={100} height={100} className="mx-auto mb-4" />
       </div>
       <nav className="flex flex-col space-y-2">

@@ -80,7 +80,8 @@ export default function Header({ onMenuClick }) {
 
   return (
     <>
-      <header className="bg-white shadow-md p-4 flex justify-between items-center">
+      <header className={"bg-white shadow-md p-4 flex justify-between items-center border-l border-2 border-gray-200"}
+      >
         <div className="flex items-center gap-4">
           {/* Botón de Menú para móvil */}
           <Button

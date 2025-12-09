@@ -291,11 +291,7 @@ const ModalEditarUsuario = ({ isOpen, onClose, usuario }) => {
               <Separator />
 
               {/* Nota informativa */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-                <p className="text-sm text-yellow-800">
-                  <strong>⚠️ Nota:</strong> Solo se puede modificar el rol del usuario. Los demás campos están bloqueados.
-                </p>
-              </div>
+    
             </div>
           </form>
         </div>

@@ -35,7 +35,7 @@ export default function DataTable({ items = [], showRestoreOnly = false, onView,
   return (
     <Table>
       <TableHeader>
-        <TableRow>
+        <TableRow className="bg-[var(--tableRow)]">
           <TableHead>Tipo</TableHead>
           <TableHead>Número</TableHead>
           <TableHead>Título / Periodo</TableHead>

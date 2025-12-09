@@ -309,11 +309,11 @@ export default function HomePage() {
     <div className="space-y-8">
   {        /* Sección del Buscador */}          
   <div
-              className="relative rounded-lg shadow-sm text-center bg-cover bg-center p-8"
+              className="relative rounded-lg shadow-sm h-64 text-center bg-cover bg-center p-8 flex items-center justify-center"
               style={{ backgroundImage: "url('/TCALandPage.png')" }}
           >
-              <h1 className="text-4xl font-bold text-white mb-4">Torre de Colecciones Antiguas</h1>
-              <div className="max-w-xl mx-auto relative">
+              <h1 className="text-4xl font-bold text-white">Torre de Colecciones Antiguas</h1>
+              {/* <div className="max-w-xl mx-auto relative">
               <Input
                 type="search"
                 placeholder="Buscar libro"
@@ -321,7 +321,7 @@ export default function HomePage() {
                 style={{ color: 'white' }}
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--selected)]" />
-              </div>
+              </div> */}
           </div>
 
           {/* Sección de Agregados Recientemente */}

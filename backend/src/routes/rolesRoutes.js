@@ -17,15 +17,14 @@ import { authenticate } from '../middleware/authMiddleware.js';
 const router = Router();
 
 // Rutas para gestión de roles (protegidas con autenticación)
-router.post('/', authenticate, createRole);              // Crear rol
+router.post('/', authenticate, createRole);  
 router.get('/', authenticate, getAllRoles);              // Obtener todos los roles
 router.get('/:id', authenticate, getRoleById);           // Obtener rol por ID
 router.put('/:id', authenticate, updateRole);            // Actualizar rol
-router.delete('/:id', authenticate, deleteRole);         // Eliminar rol
+router.delete('/:id', authenticate, deleteRole); 
 
 // Rutas para gestión de asignaciones de roles a usuarios
 router.post('/assign', authenticate, assignRoleToUser);        // Asignar rol a usuario
-router.delete('/remove', authenticate, removeRoleFromUser);    // Quitar rol de usuario
 
 // Rutas para consultas de roles y usuarios
 router.get('/user/:usuario_id', authenticate, getUserRoles);              // Obtener roles de un usuario
