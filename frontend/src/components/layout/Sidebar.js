@@ -13,6 +13,7 @@ const navLinks = [
   { name: 'Libros', href: '/libros', icon: Book },
   { name: 'Periódicos', href: '/periodicos', icon: Newspaper },
   { name: 'Diario Oficial', href: '/diario-oficial', icon: Scale },
+  { name: 'Digitalizaciones', href: '/digitalizaciones', icon: User, requiresRole: 'administrador' },
   { name: 'Usuarios', href: '/usuarios', icon: User, requiresRole: 'administrador' },
 ];
 

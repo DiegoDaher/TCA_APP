@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import diarioOficialRoutes from './src/routes/diarioOficialRoutes.js';
 import periodicosRoutes from './src/routes/periodicosRoutes.js';
 import coleccionDurangoRoutes from './src/routes/coleccionDurangoRoutes.js';
@@ -8,8 +10,12 @@ import auditoriasRoutes from './src/routes/auditoriasRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
 import forgotPasswordRoutes from './src/routes/auth.js';
 import rolesRoutes from './src/routes/rolesRoutes.js';
+import digitalizacionRoutes from './src/routes/digitalizacionRoutes.js';
 import dotenv from 'dotenv';
 import sequelize from './src/config/db.js'; // Importamos Sequelize desde config
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -28,8 +34,10 @@ app.use(express.json()); // Parsear JSON en el body
 app.get('/api', (req, res) => {
   res.send('Hello from the Express backend!');
 });
+app.use('/digitalizaciones', express.static(path.join(__dirname, 'public/digitalizaciones')));
 
 // Montar rutas
+app.use('/api/digitalizaciones', digitalizacionRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', forgotPasswordRoutes); // Ruta de forgot-password
 app.use('/api/roles', rolesRoutes); // Rutas de roles
